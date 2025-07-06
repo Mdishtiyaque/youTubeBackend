@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 
 
 const registerUser=asyncHandler(async (req,res)=>{
-  
+
 // get user details from frontend
 // validation -not empty
 // check if user already exists: username, email
@@ -37,14 +37,18 @@ const registerUser=asyncHandler(async (req,res)=>{
   }
   
   const avatarLocalPath=req.files?.avatar[0]?.path
-  const coverImageLocalPath=req.files?.coverImage[0]?.path
+  // const coverImageLocalPath=req.files?.coverImage[0]?.path
+const coverImageFile = req.files?.["coverImage"]?.[0];
+const coverImageLocalPath = coverImageFile?.path;
 
   if(!avatarLocalPath){
     throw new ApiError(400,"Avtar file is required")
 
   }
-
-
+console.log("body")
+console.log(typeof req.body)
+console.log("files")
+console.log(typeof req.files)
 const avatar=await uploadOnCloudinary(avatarLocalPath)
 const coverImage=await uploadOnCloudinary(coverImageLocalPath)  
 
@@ -54,7 +58,6 @@ if(!avatar){
 
 
 const user=await User.create(
-  
     {
         fullName,
         avtar:avatar.url,
@@ -63,7 +66,6 @@ const user=await User.create(
         password,
         username:username.toLowerCase()
     }
-
 
 )
 
