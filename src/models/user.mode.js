@@ -23,13 +23,13 @@ const userSchema=new Schema(
      },
      fullName:{
         type:String,
-        require:true,
+        required:true,
         trim:true,
         index:true
      },
     avtar:{
         type:String, //cloudinary url
-        require:true,
+        required:true,
     },
     coverImage:{
        type:String, //cloudinary  url
@@ -44,7 +44,7 @@ const userSchema=new Schema(
 
     password:{
         type:String,
-        require:[true, 'password is required']
+        required:[true, 'password is required']
     },
     refreshToken:{
         type:String
@@ -64,7 +64,7 @@ const userSchema=new Schema(
     }
     
     userSchema.methods.generateAccessToken=function (){
-      jwt.sign(
+     return jwt.sign(
         {
             _id:this._id,
             email:this.email,
@@ -78,8 +78,8 @@ const userSchema=new Schema(
       )
     }
 
-     userSchema.methods.generateAccessToken=function(){
-         jwt.sign(
+     userSchema.methods.generateRefreshToken=function(){
+       return  jwt.sign(
         {
             _id:this._id,
            
