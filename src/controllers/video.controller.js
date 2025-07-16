@@ -58,16 +58,18 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const updateVideo=asyncHandler(async (req,res)=>{
    const {videoId}= req.params
-   const {title,description}= req.body
+   console.log(videoId)
+   const {title,description}=req.body
    const thumbnailFile=req.file?.path
    
     if(!isValidObjectId(videoId)){
         throw new ApiError(400, "This video id is not valid")
     } 
+
     // if any feild not provide
    if (!thumbnailFile && !title && !description) {
-  throw new ApiError(400, "At least one field (title, description, or thumbnail) is required for update.");
-}
+     throw new ApiError(400, "At least one field (title, description, or thumbnail) is required for update.");
+  }
 
 
     const previousVideo=await Video.findOne(
@@ -127,13 +129,16 @@ const updateVideo=asyncHandler(async (req,res)=>{
 
 })
 
+
+
 const getVideoById=asyncHandler(async(req,res)=>{
     const {videoId}= req.params
+    console.log(videoId)
 
     if(!isValidObjectId(videoId)){
-        throw new ApiError(400,"this video id is not valid")
+        throw new ApiError(400, "This video id is not valid")
+    } 
 
-    }
 
     const video = await Video.findById(
         {
@@ -226,7 +231,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
         throw new ApiError(404, "video not found")
     }
 
-    if (video.videoOwner.toString() !== req.user._id.toString()) {
+    if (video.owner.toString() !== req.user._id.toString()) {
         throw new ApiError(403, "You don't have permission to delete this video!");
     }
 
@@ -255,6 +260,50 @@ const deleteVideo = asyncHandler(async (req, res) => {
     )
 })
 
+const togglePublishStatus = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
 
-export {publishAVideo,updateVideo,getVideoById,getAllVideos,deleteVideo}
+    if(!isValidObjectId(videoId)){
+        throw new ApiError(400, "This video id is not valid")
+    } 
+
+     // find video in db
+     const video = await Video.findById(
+        {
+            _id: videoId
+        }
+    )
+
+    if(!video){
+        throw new ApiError(404, "video not found")
+    }
+
+    if (video.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You don't have permission to toggle this video!")
+    }
+
+    // toggle video status
+    video.isPublished = !video.isPublished
+
+    await video.save({validateBeforeSave: false})
+
+    //return responce 
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            video,
+            "video toggle successfully!!"
+        )
+    )
+})
+
+
+export {
+    publishAVideo,
+    updateVideo,
+    getVideoById,
+    getAllVideos,
+    deleteVideo,
+    togglePublishStatus,
+}
 
