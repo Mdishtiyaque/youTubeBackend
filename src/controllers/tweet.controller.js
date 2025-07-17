@@ -1,6 +1,6 @@
 import mongoose, { isValidObjectId} from "mongoose";
 import { Tweet } from "../models/tweet.model.js";
-import { User } from "../models/user.model.js"
+import {User} from "../models/user.mode.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js"
@@ -13,7 +13,7 @@ const createTweet= asyncHandler(async(req,res)=>{
         throw new ApiError(400, "content is required")
     }
    
-    const tweet=Tweet.create({
+    const tweet= await Tweet.create({
         content,
         owner:req.user._id
     })
@@ -22,7 +22,7 @@ const createTweet= asyncHandler(async(req,res)=>{
         throw new ApiError(500,"something went wrong while creating tweet")
 
     }
-
+  console.log(tweet)
     return res.status(201).json(
         new ApiResponse(200,tweet,"tweet is created sucessfully!!")
     )
